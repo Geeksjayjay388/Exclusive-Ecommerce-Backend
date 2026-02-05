@@ -27,6 +27,19 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        message: 'Exclusive E-commerce API',
+        version: '1.0.0',
+        endpoints: {
+            health: '/api/health',
+            products: '/api/products',
+            auth: '/api/auth'
+        }
+    });
+});
+
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 
