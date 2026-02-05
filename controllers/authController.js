@@ -7,6 +7,15 @@ export const register = async (req, res) => {
     try {
         const { name, email, password, adminSecret } = req.body;
 
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
         let role = 'user';
         if (adminSecret && adminSecret === process.env.ADMIN_SECRET) {
             role = 'admin';
@@ -22,6 +31,25 @@ export const register = async (req, res) => {
 
         sendTokenResponse(user, 201, res);
     } catch (error) {
+        console.error('Registration error:', error);
+
+        // Handle mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                message: messages.join(', ')
+            });
+        }
+
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
         res.status(500).json({ success: false, message: error.message });
     }
 };

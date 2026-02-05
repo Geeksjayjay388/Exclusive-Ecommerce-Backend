@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +19,8 @@ const PORT = process.env.PORT || 5000;
 const corsOptions = {
     origin: [
         'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
         'https://exclusive-ecommerce-frontend.vercel.app'
     ],
     credentials: true,
@@ -35,13 +38,15 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/api/health',
             products: '/api/products',
-            auth: '/api/auth'
+            auth: '/api/auth',
+            analytics: '/api/analytics'
         }
     });
 });
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({
